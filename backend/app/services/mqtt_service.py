@@ -8,7 +8,12 @@ logger = logging.getLogger(__name__)
 
 class MQTTService:
     def __init__(self):
-        self.client = mqtt.Client()
+        # Use CallbackAPIVersion for compatibility with newer paho-mqtt versions
+        try:
+            self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+        except AttributeError:
+            # Fallback for older versions
+            self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.connected = False

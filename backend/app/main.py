@@ -49,7 +49,7 @@ app = FastAPI(
 # Konfiguriraj CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # U produkciji ograničiti na specifične domene
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

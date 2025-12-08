@@ -29,6 +29,11 @@ export default function SensorChart({ sensors, dataKey, label, color }) {
   // Pripremi podatke za grafikon (obrni poredak za kronološki prikaz)
   const sortedSensors = [...sensors].reverse();
   
+  // Convert RGB to RGBA for background color
+  const backgroundColor = color.includes('rgb(') 
+    ? color.replace('rgb(', 'rgba(').replace(')', ', 0.2)')
+    : color + '20';
+  
   const data = {
     labels: sortedSensors.map((sensor) => {
       const date = new Date(sensor.timestamp);
@@ -39,7 +44,7 @@ export default function SensorChart({ sensors, dataKey, label, color }) {
         label: label,
         data: sortedSensors.map((sensor) => sensor[dataKey]),
         borderColor: color,
-        backgroundColor: color + '20',
+        backgroundColor: backgroundColor,
         tension: 0.4,
         fill: true,
       },

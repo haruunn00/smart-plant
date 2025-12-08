@@ -13,7 +13,7 @@ export function useSensors(deviceId = null, hours = 24) {
   const { data, error, isLoading, mutate } = useSWR(
     `${API_URL}/sensors/?${params}`,
     fetcher,
-    { refreshInterval: 30000 } // Osvježi svake 30 sekundi
+    { refreshInterval: 30000 } // Refresh every 30 seconds
   );
 
   return {
@@ -31,7 +31,7 @@ export function useLatestSensor(deviceId = null) {
   const { data, error, isLoading, mutate } = useSWR(
     `${API_URL}/sensors/latest${params}`,
     fetcher,
-    { refreshInterval: 10000 } // Osvježi svake 10 sekundi
+    { refreshInterval: 10000 } // Refresh every 10 seconds
   );
 
   return {
@@ -50,7 +50,7 @@ export function useSensorStats(deviceId = null, hours = 24) {
   const { data, error, isLoading, mutate } = useSWR(
     `${API_URL}/sensors/stats?${params}`,
     fetcher,
-    { refreshInterval: 60000 } // Osvježi svaku minutu
+    { refreshInterval: 60000 } // Refresh every minute
   );
 
   return {

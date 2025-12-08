@@ -6,7 +6,9 @@ logger = logging.getLogger(__name__)
 
 class AIService:
     def __init__(self):
-        openai.api_key = settings.openai_api_key
+        # Use the newer OpenAI client-based approach
+        from openai import OpenAI
+        self.client = OpenAI(api_key=settings.openai_api_key)
         
     def get_plant_recommendation(self, sensor_data: dict) -> str:
         """
@@ -33,7 +35,7 @@ class AIService:
             """
             
             # Pozovi OpenAI API
-            response = openai.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "Ti si stručnjak za održavanje biljaka i IoT sustave."},
@@ -76,7 +78,7 @@ class AIService:
             Odgovori na hrvatskom jeziku.
             """
             
-            response = openai.chat.completions.create(
+            response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "Ti si data analyst specijaliziran za IoT i održavanje biljaka."},

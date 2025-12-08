@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Database
-    database_url: str = "postgresql://smartplant:password@db:5432/smartplant_db"
+    database_url: str = "postgresql://user:password@db:5432/dbname"
     
     # MQTT
     mqtt_broker: str = "mqtt"
@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     
     # API
     api_prefix: str = "/api/v1"
+    
+    # CORS
+    cors_origins: list = ["http://localhost:3000", "http://localhost:8000"]
     
     class Config:
         env_file = ".env"

@@ -7,7 +7,7 @@ export default function Settings() {
   const [mqttBroker, setMqttBroker] = useState('');
 
   const handleSave = () => {
-    // Ovdje bi se spremile postavke (trenutno samo placeholder)
+    // Settings would be saved here (currently just a placeholder)
     alert('Postavke spremljene! (funkcionalnost u razvoju)');
   };
 

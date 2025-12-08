@@ -47,9 +47,11 @@ SensorData readAllSensors() {
 // Očitaj soil moisture senzor (analogna vrijednost)
 int readSoilMoisture() {
     int rawValue = analogRead(SOIL_MOISTURE_PIN);
-    // Pretvori u postotak (0-100%)
+    // Pretvori u postotak (0-100%) koristeći kalibracijske konstante
     // Niža vrijednost = suho tlo, viša vrijednost = mokro tlo
-    int percentage = map(rawValue, 0, 4095, 0, 100);
+    int percentage = map(rawValue, SOIL_DRY_VALUE, SOIL_WET_VALUE, 0, 100);
+    // Ograniči na 0-100%
+    percentage = constrain(percentage, 0, 100);
     return percentage;
 }
 
@@ -76,5 +78,5 @@ float readLightLevel() {
 // Provjeri je li tlo suho
 bool isSoilDry() {
     int moisture = readSoilMoisture();
-    return moisture < 30;  // Manje od 30% vlažnosti
+    return moisture < SOIL_DRY_THRESHOLD;
 }
