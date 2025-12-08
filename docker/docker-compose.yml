@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # PostgreSQL with TimescaleDB
+  db:
+    image: timescale/timescaledb:latest-pg15
+    container_name: smartplant_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-smartplant}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartplant123}
+      POSTGRES_DB: ${POSTGRES_DB:-smartplant_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - smartplant_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartplant}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MQTT Broker (Eclipse Mosquitto)
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: smartplant_mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - smartplant_network
+    restart: unless-stopped
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smartplant_backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-smartplant}:${POSTGRES_PASSWORD:-smartplant123}@db:5432/${POSTGRES_DB:-smartplant_db}
+      MQTT_BROKER: mqtt
+      MQTT_PORT: 1883
+      MQTT_TOPIC_SENSOR: smartplant/sensors
+      MQTT_TOPIC_CONTROL: smartplant/control
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      API_PREFIX: /api/v1
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
+    networks:
+      - smartplant_network
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smartplant_frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - smartplant_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  mosquitto_data:
+  mosquitto_logs:
+
+networks:
+  smartplant_network:
+    driver: bridge
