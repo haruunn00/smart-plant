@@ -2,7 +2,6 @@
 #include "config.h"
 #include <ArduinoJson.h>
 
-// Globalni MQTT klijent
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 

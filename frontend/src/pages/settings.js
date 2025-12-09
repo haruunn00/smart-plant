@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../styles/global.css';
 
 export default function Settings() {
   const [deviceId, setDeviceId] = useState('ESP32_SmartPlant');

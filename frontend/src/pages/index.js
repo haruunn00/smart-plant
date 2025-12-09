@@ -3,7 +3,6 @@ import Dashboard from '../components/Dashboard';
 import SensorChart from '../components/SensorChart';
 import ControlPanel from '../components/ControlPanel';
 import { useSensors } from '../hooks/useSensors';
-import '../styles/global.css';
 
 export default function Home() {
   const { sensors, isLoading, isError } = useSensors(null, 24);

@@ -3,18 +3,15 @@
 #include "sensors.h"
 #include "mqtt.h"
 
-// Varijable za timing
 unsigned long lastSensorRead = 0;
 
 void setup() {
-    // Inicijaliziraj serijsku komunikaciju
     Serial.begin(115200);
     delay(1000);
     
     Serial.println("\n\n=== Smart Plant IoT System ===");
     Serial.println("Inicijalizacija...\n");
     
-    // Povezivanje na WiFi
     Serial.print("Povezivanje na WiFi: ");
     Serial.println(WIFI_SSID);
     
@@ -36,19 +33,17 @@ void setup() {
         return;
     }
     
-    // Inicijaliziraj senzore
+
     if (!initSensors()) {
         Serial.println("Greška pri inicijalizaciji senzora!");
         return;
     }
     
-    // Inicijaliziraj MQTT
     if (!initMQTT()) {
         Serial.println("Greška pri inicijalizaciji MQTT klijenta!");
         return;
     }
-    
-    // Poveži se na MQTT broker
+  
     connectMQTT();
     
     Serial.println("\nSistem je spreman!");
@@ -56,20 +51,16 @@ void setup() {
 
 void loop() {
     unsigned long currentMillis = millis();
-    
-    // Održavaj MQTT konekciju
+
     mqttLoop();
     
-    // Očitaj senzore svakih 30 sekundi
     if (currentMillis - lastSensorRead >= SENSOR_READ_INTERVAL) {
         lastSensorRead = currentMillis;
         
         Serial.println("\n--- Očitavanje senzora ---");
         
-        // Očitaj sve senzore
         SensorData data = readAllSensors();
         
-        // Ispiši podatke u serijskom monitoru
         Serial.print("Temperatura: ");
         Serial.print(data.temperature);
         Serial.println(" °C");
@@ -90,20 +81,18 @@ void loop() {
         Serial.print(data.lightLevel);
         Serial.println(" lux");
         
-        // Objavi podatke na MQTT
         if (WiFi.status() == WL_CONNECTED) {
             publishSensorData(data);
         } else {
             Serial.println("WiFi nije povezan, pokušavam ponovno...");
             WiFi.reconnect();
         }
-        
-        // Provjeri je li tlo suho i upozori
+       
         if (isSoilDry()) {
             Serial.println("UPOZORENJE: Tlo je suho! Možda je vrijeme za zalijevanje.");
         }
     }
     
-    // Malo kašnjenje
+  
     delay(100);
 }

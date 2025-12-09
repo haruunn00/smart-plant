@@ -1,7 +1,5 @@
--- Enable TimescaleDB extension
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
--- Create users table
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
@@ -9,7 +7,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create devices table
 CREATE TABLE IF NOT EXISTS devices (
     id SERIAL PRIMARY KEY,
     device_id VARCHAR(100) UNIQUE NOT NULL,
@@ -18,9 +15,8 @@ CREATE TABLE IF NOT EXISTS devices (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create sensor_data table
 CREATE TABLE IF NOT EXISTS sensor_data (
-    id SERIAL PRIMARY KEY,
+    id SERIAL NOT NULL,
     device_id VARCHAR(100) NOT NULL,
     temperature FLOAT,
     humidity FLOAT,
@@ -30,19 +26,15 @@ CREATE TABLE IF NOT EXISTS sensor_data (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
--- Convert sensor_data to TimescaleDB hypertable
 SELECT create_hypertable('sensor_data', 'timestamp', if_not_exists => TRUE);
 
--- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_sensor_data_device_id ON sensor_data(device_id);
 CREATE INDEX IF NOT EXISTS idx_sensor_data_timestamp ON sensor_data(timestamp DESC);
 
--- Insert default device
 INSERT INTO devices (device_id, name, location) 
 VALUES ('ESP32_SmartPlant', 'Smart Plant Main', 'Living Room')
 ON CONFLICT (device_id) DO NOTHING;
 
--- Create view for latest sensor readings
 CREATE OR REPLACE VIEW latest_sensor_data AS
 SELECT DISTINCT ON (device_id) 
     device_id,
@@ -55,7 +47,6 @@ SELECT DISTINCT ON (device_id)
 FROM sensor_data
 ORDER BY device_id, timestamp DESC;
 
--- Grant permissions
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO smartplant;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO smartplant;
 
