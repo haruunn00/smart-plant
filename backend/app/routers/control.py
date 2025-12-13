@@ -8,7 +8,7 @@ router = APIRouter(prefix="/control", tags=["control"])
 class PumpControlRequest(BaseModel):
     pump: bool
     device_id: str = "ESP32_SmartPlant"
-    duration: int = 5  # Trajanje u sekundama (opciono)
+    duration: int = 5 
 
 class PumpControlResponse(BaseModel):
     success: bool
@@ -21,13 +21,11 @@ async def control_pump(request: PumpControlRequest):
     Kontroliraj pumpu za zalijevanje
     """
     try:
-        # Pripremi poruku za MQTT
         message = {
             "pump": request.pump,
             "device_id": request.device_id
         }
         
-        # Pošalji poruku na MQTT
         success = mqtt_service.publish(settings.mqtt_topic_control, message)
         
         if success:

@@ -8,11 +8,9 @@ logger = logging.getLogger(__name__)
 
 class MQTTService:
     def __init__(self):
-        # Use CallbackAPIVersion for compatibility with newer paho-mqtt versions
         try:
             self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
         except AttributeError:
-            # Fallback for older versions
             self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
@@ -23,7 +21,6 @@ class MQTTService:
         if rc == 0:
             logger.info("Povezan na MQTT broker")
             self.connected = True
-            # Pretplati se na sensor topic
             client.subscribe(settings.mqtt_topic_sensor)
             logger.info(f"Pretplaćen na topic: {settings.mqtt_topic_sensor}")
         else:
@@ -32,11 +29,9 @@ class MQTTService:
     def on_message(self, client, userdata, msg):
         """Callback kada stigne nova poruka"""
         try:
-            # Dekodiraj JSON payload
             payload = json.loads(msg.payload.decode())
             logger.info(f"Primljena poruka: {payload}")
             
-            # Spremi u bazu podataka
             self.save_to_database(payload)
             
         except json.JSONDecodeError as e:
@@ -91,5 +86,4 @@ class MQTTService:
         self.client.disconnect()
         logger.info("MQTT klijent zaustavljen")
 
-# Globalna instanca MQTT servisa
 mqtt_service = MQTTService()

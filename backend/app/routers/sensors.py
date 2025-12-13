@@ -36,22 +36,17 @@ async def get_sensor_data(
     try:
         query = db.query(SensorDataDB)
         
-        # Filter po device_id
         if device_id:
             query = query.filter(SensorDataDB.device_id == device_id)
-        
-        # Filter po vremenu
+    
         if hours:
             time_threshold = datetime.utcnow() - timedelta(hours=hours)
             query = query.filter(SensorDataDB.timestamp >= time_threshold)
         
-        # Sortiraj po vremenu (najnoviji prvi)
         query = query.order_by(SensorDataDB.timestamp.desc())
         
-        # Izbroj ukupan broj
         total_count = query.count()
         
-        # Paginiraj
         data = query.offset(skip).limit(limit).all()
         
         return SensorDataResponse(data=data, count=total_count)

@@ -4,12 +4,10 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from app.config import settings
 
-# Kreiraj engine za bazu
 engine = create_engine(settings.database_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Model za senzorske podatke
 class SensorDataDB(Base):
     __tablename__ = "sensor_data"
     
@@ -22,7 +20,7 @@ class SensorDataDB(Base):
     light_level = Column(Float)
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)
 
-# Model za korisnike
+
 class UserDB(Base):
     __tablename__ = "users"
     
@@ -31,7 +29,7 @@ class UserDB(Base):
     email = Column(String, unique=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-# Model za uređaje
+
 class DeviceDB(Base):
     __tablename__ = "devices"
     
@@ -41,7 +39,6 @@ class DeviceDB(Base):
     location = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-# Dependency za dobivanje database sessiona
 def get_db():
     db = SessionLocal()
     try:
@@ -49,6 +46,5 @@ def get_db():
     finally:
         db.close()
 
-# Kreiraj tablice
 def init_db():
     Base.metadata.create_all(bind=engine)

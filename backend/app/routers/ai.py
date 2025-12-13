@@ -32,7 +32,6 @@ async def get_ai_recommendation(
     Dohvati AI preporuku za održavanje biljke na temelju senzorskih podataka
     """
     try:
-        # Dohvati najnovije podatke
         query = db.query(SensorDataDB)
         
         if request.device_id:
@@ -43,7 +42,6 @@ async def get_ai_recommendation(
         if not latest_data:
             raise HTTPException(status_code=404, detail="Nema dostupnih senzorskih podataka")
         
-        # Pripremi podatke za AI
         sensor_data = {
             "temperature": latest_data.temperature,
             "humidity": latest_data.humidity,
@@ -88,7 +86,6 @@ async def analyze_trend(
         if not data:
             raise HTTPException(status_code=404, detail="Nema dovoljno podataka za analizu")
         
-        # Pretvori u listu rječnika
         historical_data = [
             {
                 "temperature": d.temperature,
@@ -98,8 +95,7 @@ async def analyze_trend(
             }
             for d in data
         ]
-        
-        # Analiziraj trend
+
         analysis = ai_service.analyze_trend(historical_data)
         
         return TrendAnalysisResponse(

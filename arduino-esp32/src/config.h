@@ -1,8 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define WIFI_SSID "your_wifi_ssid"
-#define WIFI_PASSWORD "your_wifi_password"
+#define WIFI_SSID "hara"
+#define WIFI_PASSWORD "12345678"
 
 #define MQTT_BROKER "192.168.1.100"
 #define MQTT_PORT 1883

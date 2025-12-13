@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 class AIService:
     def __init__(self):
-        # Use the newer OpenAI client-based approach
         from openai import OpenAI
         self.client = OpenAI(api_key=settings.openai_api_key)
         
@@ -15,7 +14,6 @@ class AIService:
         Generiraj AI preporuku za održavanje biljke na temelju senzorskih podataka
         """
         try:
-            # Pripremi prompt za OpenAI
             prompt = f"""
             Kao stručnjak za održavanje biljaka, analiziraj sljedeće podatke senzora i daj preporuku:
             
@@ -34,7 +32,6 @@ class AIService:
             Odgovori na hrvatskom jeziku, kratko i jasno.
             """
             
-            # Pozovi OpenAI API
             response = self.client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -60,11 +57,9 @@ class AIService:
         try:
             if not historical_data:
                 return "Nema dovoljno podataka za analizu trenda."
-            
-            # Pripremi sažetak podataka
+  
             summary = f"Analizirano {len(historical_data)} mjerenja:\n"
             
-            # Izračunaj prosječne vrijednosti
             avg_temp = sum(d.get('temperature', 0) for d in historical_data) / len(historical_data)
             avg_moisture = sum(d.get('soil_moisture', 0) for d in historical_data) / len(historical_data)
             
@@ -96,5 +91,4 @@ class AIService:
             logger.error(f"Greška pri analizi trenda: {e}")
             return "Trenutno nije moguće analizirati trend. Molimo pokušajte kasnije."
 
-# Globalna instanca AI servisa
 ai_service = AIService()
