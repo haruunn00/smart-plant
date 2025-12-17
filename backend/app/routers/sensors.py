@@ -9,9 +9,6 @@ router = APIRouter(prefix="/sensors", tags=["sensors"])
 
 @router.post("/", response_model=SensorData)
 async def create_sensor_data(sensor_data: SensorDataCreate, db: Session = Depends(get_db)):
-    """
-    Stvori novi unos senzorskih podataka
-    """
     try:
         db_sensor_data = SensorDataDB(**sensor_data.dict())
         db.add(db_sensor_data)
@@ -30,9 +27,6 @@ async def get_sensor_data(
     hours: Optional[int] = Query(default=24, description="Broj sati unazad"),
     db: Session = Depends(get_db)
 ):
-    """
-    Dohvati senzorske podatke s opcionalnim filterima
-    """
     try:
         query = db.query(SensorDataDB)
         
@@ -58,9 +52,6 @@ async def get_latest_sensor_data(
     device_id: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
-    """
-    Dohvati najnovije senzorske podatke
-    """
     try:
         query = db.query(SensorDataDB)
         
@@ -84,9 +75,6 @@ async def get_sensor_stats(
     hours: int = Query(default=24, description="Broj sati za statistiku"),
     db: Session = Depends(get_db)
 ):
-    """
-    Dohvati statistiku senzorskih podataka (prosjek, min, max)
-    """
     try:
         from sqlalchemy import func
         

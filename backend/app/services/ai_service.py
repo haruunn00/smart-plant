@@ -10,9 +10,6 @@ class AIService:
         self.client = OpenAI(api_key=settings.openai_api_key)
         
     def get_plant_recommendation(self, sensor_data: dict) -> str:
-        """
-        Generiraj AI preporuku za održavanje biljke na temelju senzorskih podataka
-        """
         try:
             prompt = f"""
             Kao stručnjak za održavanje biljaka, analiziraj sljedeće podatke senzora i daj preporuku:
@@ -51,9 +48,6 @@ class AIService:
             return "Trenutno nije moguće generirati preporuku. Molimo pokušajte kasnije."
     
     def analyze_trend(self, historical_data: list) -> str:
-        """
-        Analiziraj trend senzorskih podataka kroz vrijeme
-        """
         try:
             if not historical_data:
                 return "Nema dovoljno podataka za analizu trenda."

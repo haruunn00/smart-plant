@@ -28,9 +28,6 @@ async def get_ai_recommendation(
     request: AIRecommendationRequest,
     db: Session = Depends(get_db)
 ):
-    """
-    Dohvati AI preporuku za održavanje biljke na temelju senzorskih podataka
-    """
     try:
         query = db.query(SensorDataDB)
         
@@ -68,13 +65,8 @@ async def analyze_trend(
     request: TrendAnalysisRequest,
     db: Session = Depends(get_db)
 ):
-    """
-    Analiziraj trend senzorskih podataka kroz vrijeme
-    """
     try:
         from datetime import datetime, timedelta
-        
-        # Dohvati podatke za zadani period
         time_threshold = datetime.utcnow() - timedelta(hours=request.hours)
         query = db.query(SensorDataDB).filter(SensorDataDB.timestamp >= time_threshold)
         

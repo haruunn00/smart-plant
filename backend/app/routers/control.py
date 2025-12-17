@@ -17,9 +17,6 @@ class PumpControlResponse(BaseModel):
 
 @router.post("/pump", response_model=PumpControlResponse)
 async def control_pump(request: PumpControlRequest):
-    """
-    Kontroliraj pumpu za zalijevanje
-    """
     try:
         message = {
             "pump": request.pump,
@@ -43,9 +40,6 @@ async def control_pump(request: PumpControlRequest):
 
 @router.post("/auto-water")
 async def auto_water(device_id: str = "ESP32_SmartPlant"):
-    """
-    Automatski zalijeј biljku na temelju vlažnosti tla
-    """
     try:
         # TODO: Dohvati najnovije podatke o vlažnosti tla
         # TODO: Ako je tlo suho, uključi pumpu na određeno vrijeme

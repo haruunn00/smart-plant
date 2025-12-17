@@ -48,7 +48,7 @@ services:
       MQTT_TOPIC_SENSOR: smartplant/sensors
       MQTT_TOPIC_CONTROL: smartplant/control
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      API_PREFIX: /api/v1
+      API_PREFIX: /api
     ports:
       - "8000:8000"
     depends_on:
