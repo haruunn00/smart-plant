@@ -45,7 +45,10 @@ class AIService:
             
         except Exception as e:
             logger.error(f"Greška pri generiranju AI preporuke: {e}")
-            return "Trenutno nije moguće generirati preporuku. Molimo pokušajte kasnije."
+            if "insufficient_quota" in str(e).lower():
+                return "OpenAI API quota je iscrpljen. Molimo provjerite svoj OpenAI račun i dodajte kredite."
+            else:
+                return "Trenutno nije moguće generirati preporuku. Molimo pokušajte kasnije."
     
     def analyze_trend(self, historical_data: list) -> str:
         try:
@@ -83,6 +86,49 @@ class AIService:
             
         except Exception as e:
             logger.error(f"Greška pri analizi trenda: {e}")
-            return "Trenutno nije moguće analizirati trend. Molimo pokušajte kasnije."
+            if "insufficient_quota" in str(e).lower():
+                return "OpenAI API quota je iscrpljen. Molimo provjerite svoj OpenAI račun i dodajte kredite."
+            else:
+                return "Trenutno nije moguće analizirati trend. Molimo pokušajte kasnije."
+    
+    def chat_with_user(self, user_message: str, sensor_context: str = "") -> str:
+        try:
+            system_prompt = f"""Ti si AI asistent specijaliziran ISKLJUČIVO za pametno održavanje biljaka i IoT sustave za monitoring biljaka. 
+
+VAŽNO: Odgovaraj SAMO na pitanja vezana za:
+- Brigu o biljkama (zalivanje, temperatura, svjetlost, vlažnost, đubrenje)
+- Analizu senzorskih podataka
+- Problemi sa biljkama i njihovo rješavanje
+- Preporuke za optimalne uvjete rasta
+- Funkcionalnosti Smart Plant aplikacije
+
+NE odgovaraj na pitanja koja nisu vezana za biljke, IoT monitoring ili ovu aplikaciju. Ako korisnik postavi pitanje izvan ovih tema, ljubazno ga usmjeri nazad na teme vezane za brigu o biljkama.
+
+{sensor_context}
+
+Odgovaraj na hrvatskom jeziku, budi prijateljski, koristan i temelji svoje savjete na realnim senzorskim podacima kada su dostupni."""
+            
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                max_tokens=300,
+                temperature=0.7
+            )
+            
+            chat_response = response.choices[0].message.content.strip()
+            logger.info("AI chat odgovor uspješno generiran")
+            return chat_response
+            
+        except Exception as e:
+            logger.error(f"Greška pri chat-u sa AI: {e}")
+            if "insufficient_quota" in str(e).lower():
+                return "OpenAI API quota je iscrpljen. Molimo provjerite svoj OpenAI račun i dodajte kredite, ili koristite drugi API ključ."
+            elif "connection" in str(e).lower():
+                return "Nema internet konekcije za OpenAI API. Molimo provjerite mrežnu vezu."
+            else:
+                return "Žao mi je, trenutno ne mogu odgovoriti zbog tehničkih problema. Molimo pokušajte kasnije."
 
 ai_service = AIService()

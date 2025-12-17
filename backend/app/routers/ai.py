@@ -23,6 +23,13 @@ class TrendAnalysisResponse(BaseModel):
     analysis: str
     data_points: int
 
+class ChatRequest(BaseModel):
+    message: str
+    device_id: Optional[str] = None
+
+class ChatResponse(BaseModel):
+    response: str
+
 @router.post("/recommendation", response_model=AIRecommendationResponse)
 async def get_ai_recommendation(
     request: AIRecommendationRequest,
@@ -99,3 +106,34 @@ async def analyze_trend(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Greška pri analizi trenda: {str(e)}")
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat_with_ai(
+    request: ChatRequest,
+    db: Session = Depends(get_db)
+):
+    try:
+        # Dobavi najnovije senzorske podatke
+        query = db.query(SensorDataDB)
+        
+        if request.device_id:
+            query = query.filter(SensorDataDB.device_id == request.device_id)
+        
+        latest_data = query.order_by(SensorDataDB.timestamp.desc()).first()
+        
+        sensor_context = ""
+        if latest_data:
+            sensor_context = f"""
+            Trenutni senzorski podaci:
+            - Temperatura: {latest_data.temperature}°C
+            - Vlažnost zraka: {latest_data.humidity}%
+            - Vlažnost tla: {latest_data.soil_moisture}%
+            - Razina svjetlosti: {latest_data.light_level} lux
+            """
+        
+        response = ai_service.chat_with_user(request.message, sensor_context)
+        
+        return ChatResponse(response=response)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Greška pri chat-u sa AI: {str(e)}")

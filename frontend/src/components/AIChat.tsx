@@ -29,42 +29,6 @@ export function AIChat() {
     scrollToBottom();
   }, [messages]);
 
-  // AI response logic with plant care knowledge
-  const getAIResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-
-    if (lowerMessage.includes('water') || lowerMessage.includes('zalij')) {
-      return 'Based on current soil moisture levels (45%), your plant is in good condition. However, I recommend watering when moisture drops below 35%. Most houseplants prefer soil that\'s moist but not waterlogged. You can use the manual watering button on the Dashboard to water immediately, or let the automatic system handle it when needed.';
-    }
-    
-    if (lowerMessage.includes('temperature') || lowerMessage.includes('temperatura')) {
-      return 'The current temperature is 22.5°C, which is ideal for most houseplants. The optimal temperature range is typically 18-26°C during the day and slightly cooler at night. If temperatures exceed 28°C, consider moving your plant to a cooler location or increasing ventilation.';
-    }
-    
-    if (lowerMessage.includes('light') || lowerMessage.includes('svjetlo')) {
-      return 'Your plant is receiving 72% light exposure, which is quite good! Most houseplants thrive with bright, indirect light. If you notice light levels consistently below 30%, consider moving your plant closer to a window or using grow lights. Too much direct sunlight can scorch leaves, while too little causes slow growth.';
-    }
-    
-    if (lowerMessage.includes('humidity') || lowerMessage.includes('vlažnost')) {
-      return 'Current air humidity is at 65%, which is excellent for most tropical plants. Ideal humidity ranges from 50-70%. If humidity drops below 40%, you might notice brown leaf tips. You can increase humidity by misting, using a humidifier, or placing the pot on a pebble tray with water.';
-    }
-    
-    if (lowerMessage.includes('health') || lowerMessage.includes('zdravlje') || lowerMessage.includes('status')) {
-      return 'Your plant appears to be healthy! 🌱 All parameters are within optimal ranges:\n- Soil Moisture: 45% (Good)\n- Temperature: 22.5°C (Ideal)\n- Humidity: 65% (Excellent)\n- Light: 72% (Very Good)\n\nKeep up the great care! The automatic watering system will maintain optimal moisture levels.';
-    }
-    
-    if (lowerMessage.includes('problem') || lowerMessage.includes('yellow') || lowerMessage.includes('žut')) {
-      return 'Yellow leaves can indicate several issues:\n1. Overwatering - Check if soil moisture is consistently above 80%\n2. Underwatering - If moisture drops below 25% regularly\n3. Nutrient deficiency - Consider fertilizing monthly\n4. Too much direct sunlight - Move to indirect light\n\nBased on your current readings, all parameters look good, so if you\'re seeing yellowing, it might be a natural aging process or nutrient-related.';
-    }
-
-    if (lowerMessage.includes('fertilizer') || lowerMessage.includes('đubrivo')) {
-      return 'For optimal growth, fertilize your plant during the growing season (spring and summer) about once a month. Use a balanced, water-soluble fertilizer diluted to half strength. Avoid fertilizing in winter when most plants are dormant. The Smart Plant system can remind you when it\'s time to fertilize!';
-    }
-
-    // Default response
-    return 'That\'s a great question! Based on the sensor data I\'m monitoring, your plant is currently in good health. I can provide specific advice about watering schedules, light requirements, temperature control, humidity levels, or troubleshoot any plant health issues. What would you like to know more about?';
-  };
-
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -76,20 +40,46 @@ export function AIChat() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8000/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentInput,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: getAIResponse(input),
+        content: data.response,
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Žao mi je, trenutno ne mogu odgovoriti. Molimo pokušajte kasnije.',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000);
+    }
   };
 
   const quickQuestions = [

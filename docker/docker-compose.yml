@@ -41,13 +41,14 @@ services:
       context: ../backend
       dockerfile: Dockerfile
     container_name: smartplant_backend
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-smartplant}:${POSTGRES_PASSWORD:-smartplant123}@db:5432/${POSTGRES_DB:-smartplant_db}
       MQTT_BROKER: mqtt
       MQTT_PORT: 1883
       MQTT_TOPIC_SENSOR: smartplant/sensors
       MQTT_TOPIC_CONTROL: smartplant/control
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       API_PREFIX: /api
     ports:
       - "8000:8000"
