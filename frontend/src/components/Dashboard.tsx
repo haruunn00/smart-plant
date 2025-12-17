@@ -12,45 +12,89 @@ interface SensorData {
 
 export function Dashboard() {
   const [sensorData, setSensorData] = useState<SensorData>({
-    soilMoisture: 45,
-    temperature: 22.5,
-    humidity: 65,
-    lightLevel: 72,
+    soilMoisture: 0,
+    temperature: 0,
+    humidity: 0,
+    lightLevel: 0,
     pumpActive: false,
     lastUpdate: new Date(),
   });
 
   const [isWatering, setIsWatering] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulate real-time data updates
+  // Fetch real sensor data from backend
+  const fetchSensorData = async () => {
+    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/sensors/latest?t=${Date.now()}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch sensor data: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      
+      setSensorData({
+        soilMoisture: data.soil_moisture || 0,
+        temperature: data.temperature || 0,
+        humidity: data.humidity || 0,
+        lightLevel: data.light_level || 0,
+        pumpActive: false, // TODO: Add pump status from API if available
+        lastUpdate: new Date(data.timestamp),
+      });
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching sensor data:', err);
+      setError('Unable to fetch sensor data');
+    }
+  };
+
+  // Fetch data on mount and every 5 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSensorData(prev => ({
-        ...prev,
-        soilMoisture: Math.max(20, Math.min(80, prev.soilMoisture + (Math.random() - 0.5) * 3)),
-        temperature: Math.max(18, Math.min(30, prev.temperature + (Math.random() - 0.5) * 0.5)),
-        humidity: Math.max(40, Math.min(90, prev.humidity + (Math.random() - 0.5) * 2)),
-        lightLevel: Math.max(0, Math.min(100, prev.lightLevel + (Math.random() - 0.5) * 5)),
-        lastUpdate: new Date(),
-      }));
-    }, 3000);
-
+    fetchSensorData();
+    const interval = setInterval(fetchSensorData, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const handleWaterPlant = async () => {
     setIsWatering(true);
-    setSensorData(prev => ({ ...prev, pumpActive: true }));
-    
-    // Simulate watering duration
-    setTimeout(() => {
-      setIsWatering(false);
-      setSensorData(prev => ({ 
-        ...prev, 
-        pumpActive: false,
-        soilMoisture: Math.min(100, prev.soilMoisture + 15)
-      }));
-    }, 5000);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/control/pump`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pump: true,
+          duration: 5,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to control pump');
+      }
+      
+      const result = await response.json();
+      console.log('Pump control result:', result);
+      
+      // Update local state based on response
+      setSensorData(prev => ({ ...prev, pumpActive: result.pump_state }));
+      
+    } catch (err) {
+      console.error('Error controlling pump:', err);
+      setError('Failed to control water pump');
+    } finally {
+      setTimeout(() => {
+        setIsWatering(false);
+        // Refresh sensor data after watering
+        fetchSensorData();
+      }, 5000);
+    }
   };
 
   const getStatusColor = (value: number, type: string) => {
@@ -83,7 +127,14 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Status Alert */}
+      {error && (
+        <div className="flex items-start gap-3 p-4 rounded-lg border bg-red-50 border-red-200 text-red-800">
+          <AlertCircle className="w-5 h-5 mt-0.5" />
+          <div>
+            <p>{error}</p>
+          </div>
+        </div>
+      )}
       <div className={`flex items-start gap-3 p-4 rounded-lg border ${status.color}`}>
         <AlertCircle className="w-5 h-5 mt-0.5" />
         <div>
@@ -94,9 +145,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Sensor Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Soil Moisture */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-blue-50 rounded-lg">
@@ -115,7 +164,6 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Temperature */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-orange-50 rounded-lg">
@@ -134,7 +182,6 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Humidity */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-teal-50 rounded-lg">
@@ -153,7 +200,6 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Light Level */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-yellow-50 rounded-lg">
@@ -173,7 +219,6 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Control Panel */}
       <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-xl text-gray-800 mb-4">Manual Controls</h2>
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -208,7 +253,6 @@ export function Dashboard() {
         )}
       </div>
 
-      {/* Live Data Feed */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-xl text-gray-800 mb-4">Live Sensor Feed</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
