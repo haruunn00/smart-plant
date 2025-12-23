@@ -2,33 +2,47 @@
 #define SENSORS_H
 
 #include <Arduino.h>
-#include <Adafruit_BME280.h>
-#include <BH1750.h>
 
-// Struktura za senzorske podatke
+// ═══════════════════════════════════════════
+// Struktura za Senzorske Podatke
+// ═══════════════════════════════════════════
 struct SensorData {
-    float temperature;
-    float humidity;
-    float pressure;
-    int soilMoisture;
-    float lightLevel;
+    float temperature;      // Temperatura u °C
+    int soilMoisture;       // Vlažnost tla u %
+    int waterLevel;         // Nivo vode u %
+    int lightLevel;         // Razina svjetlosti u %
+    int humidity;           // Vlažnost zraka u % (simulirana)
     unsigned long timestamp;
 };
 
-// Inicijalizacija senzora
+// ═══════════════════════════════════════════
+// Funkcije za Inicijalizaciju
+// ═══════════════════════════════════════════
 bool initSensors();
+void initLEDs();
 
-// Očitavanje svih senzora
+// ═══════════════════════════════════════════
+// Funkcije za Očitavanje Senzora
+// ═══════════════════════════════════════════
 SensorData readAllSensors();
-
-// Očitavanje pojedinačnih senzora
 int readSoilMoisture();
+int readWaterLevel();
+int readLightLevel();
 float readTemperature();
-float readHumidity();
-float readPressure();
-float readLightLevel();
+int generateHumidity();    // Simulirana vlažnost zraka
 
-// Provjera je li tlo suho
+// ═══════════════════════════════════════════
+// Pomoćne Funkcije
+// ═══════════════════════════════════════════
 bool isSoilDry();
+bool isWaterLow();
+bool isNightTime();
+
+// ═══════════════════════════════════════════
+// LED Kontrola
+// ═══════════════════════════════════════════
+void setGreenLED(bool state);
+void setRedLED(bool state);
+void blinkLED(int pin, int times, int delayMs);
 
 #endif

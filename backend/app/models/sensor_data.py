@@ -4,11 +4,11 @@ from typing import Optional
 
 class SensorDataBase(BaseModel):
     device_id: str
-    temperature: float
-    humidity: float
-    pressure: float
+    temperature:  float
     soil_moisture: int
-    light_level: float
+    water_level: int
+    light_level: int
+    humidity: Optional[int] = None  # Vlažnost zraka (simulirana)
 
 class SensorDataCreate(SensorDataBase):
     pass

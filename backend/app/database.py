@@ -14,20 +14,11 @@ class SensorDataDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     device_id = Column(String, index=True)
     temperature = Column(Float)
-    humidity = Column(Float)
-    pressure = Column(Float)
     soil_moisture = Column(Integer)
-    light_level = Column(Float)
+    water_level = Column(Integer)
+    light_level = Column(Integer)
+    humidity = Column(Integer)           # Vlažnost zraka (simulirana)
     timestamp = Column(DateTime, default=datetime.utcnow, index=True)
-
-
-class UserDB(Base):
-    __tablename__ = "users"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class DeviceDB(Base):

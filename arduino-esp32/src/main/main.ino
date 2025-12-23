@@ -9,10 +9,21 @@ void setup() {
     Serial.begin(115200);
     delay(1000);
     
-    Serial.println("\n\n=== Smart Plant IoT System ===");
-    Serial.println("Inicijalizacija...\n");
+    Serial.println("\n\n╔═══════════════════════════════════╗");
+    Serial.println("║  Smart Plant IoT System v2.0     ║");
+    Serial.println("║  ESP32 DevKit v1                  ║");
+    Serial.println("╚═══════════════════════════════════╝\n");
     
-    Serial.print("Povezivanje na WiFi: ");
+    // ═══════════════════════════════════════════
+    // Inicijalizacija LED dioda
+    // ═══════════════════════════════════════════
+    initLEDs();
+    setRedLED(true);  // Crvena tokom inicijalizacije
+    
+    // ═══════════════════════════════════════════
+    // WiFi Povezivanje
+    // ═══════════════════════════════════════════
+    Serial.print("Povezivanje na WiFi:  ");
     Serial.println(WIFI_SSID);
     
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -24,75 +35,113 @@ void setup() {
         attempts++;
     }
     
-    if (WiFi.status() == WL_CONNECTED) {
-        Serial.println("\nWiFi povezan!");
+    if (WiFi. status() == WL_CONNECTED) {
+        Serial.println("\n✓ WiFi povezan!");
         Serial.print("IP adresa: ");
         Serial.println(WiFi.localIP());
+        setGreenLED(true);
+        setRedLED(false);
     } else {
-        Serial.println("\nGreška: Nije moguće spojiti se na WiFi!");
+        Serial.println("\n❌ WiFi greška!");
+        setRedLED(true);
+        blinkLED(RED_LED_PIN, 10, 200);
         return;
     }
     
-
+    // ═══════════════════════════════════════════
+    // Inicijalizacija Senzora
+    // ═══════════════════════════════════════════
     if (!initSensors()) {
-        Serial.println("Greška pri inicijalizaciji senzora!");
+        Serial.println("❌ Greška:  Senzori!");
+        setRedLED(true);
         return;
     }
     
+    // ═══════════════════════════════════════════
+    // Inicijalizacija MQTT
+    // ═══════════════════════════════════════════
     if (!initMQTT()) {
-        Serial.println("Greška pri inicijalizaciji MQTT klijenta!");
+        Serial.println("❌ MQTT greška!");
         return;
     }
-  
+    
     connectMQTT();
     
-    Serial.println("\nSistem je spreman!");
+    Serial.println("\n═══════════════════════════════════");
+    Serial.println("  ✓ Sistem spreman!");
+    Serial.println("═══════════════════════════════════\n");
+    
+    setRedLED(false);
+    blinkLED(GREEN_LED_PIN, 3, 200);
 }
 
 void loop() {
     unsigned long currentMillis = millis();
-
+    
+    // ═══════════════════════════════════════════
+    // MQTT Loop
+    // ═══════════════════════════════════════════
     mqttLoop();
     
+    // ═══════════════════════════════════════════
+    // Očitavanje Senzora
+    // ═══════════════════════════════════════════
     if (currentMillis - lastSensorRead >= SENSOR_READ_INTERVAL) {
         lastSensorRead = currentMillis;
         
-        Serial.println("\n--- Očitavanje senzora ---");
+        Serial.println("\n─── Očitavanje senzora ───");
         
         SensorData data = readAllSensors();
         
-        Serial.print("Temperatura: ");
-        Serial.print(data.temperature);
+        // Ispis na Serial
+        Serial.print("🌡️  Temperatura:     ");
+        Serial.print(data.temperature, 1);
         Serial.println(" °C");
         
-        Serial.print("Vlažnost zraka: ");
-        Serial.print(data.humidity);
-        Serial.println(" %");
-        
-        Serial.print("Tlak: ");
-        Serial.print(data.pressure);
-        Serial.println(" hPa");
-        
-        Serial.print("Vlažnost tla: ");
+        Serial.print("💧 Vlažnost tla:    ");
         Serial.print(data.soilMoisture);
         Serial.println(" %");
         
-        Serial.print("Razina svjetlosti: ");
-        Serial.print(data.lightLevel);
-        Serial.println(" lux");
+        Serial.print("🚰 Nivo vode:       ");
+        Serial.print(data.waterLevel);
+        Serial.println(" %");
         
+        Serial.print("💡 Svjetlost (LDR): ");
+        Serial.print(data.lightLevel);
+        Serial.println(" %");
+        
+        // Objavi podatke preko MQTT
         if (WiFi.status() == WL_CONNECTED) {
             publishSensorData(data);
         } else {
-            Serial.println("WiFi nije povezan, pokušavam ponovno...");
+            Serial.println("⚠️  WiFi nije povezan!");
             WiFi.reconnect();
         }
-       
+        
+        // Upozorenja
         if (isSoilDry()) {
-            Serial.println("UPOZORENJE: Tlo je suho! Možda je vrijeme za zalijevanje.");
+            Serial.println("⚠️  TLO JE SUVO!");
+            blinkLED(RED_LED_PIN, 2, 100);
+        }
+        
+        if (isWaterLow()) {
+            Serial. println("⚠️  NIZAK NIVO VODE!");
+            blinkLED(RED_LED_PIN, 3, 100);
+        }
+        
+        if (isNightTime()) {
+            Serial.println("🌙 Noć je");
+        }
+        
+        // LED status
+        if (isSoilDry() || isWaterLow()) {
+            setRedLED(true);
+            setGreenLED(false);
+        } else {
+            setRedLED(false);
+            setGreenLED(true);
         }
     }
     
-  
     delay(100);
 }

@@ -48,9 +48,8 @@ async def get_ai_recommendation(
         
         sensor_data = {
             "temperature": latest_data.temperature,
-            "humidity": latest_data.humidity,
-            "pressure": latest_data.pressure,
             "soil_moisture": latest_data.soil_moisture,
+            "water_level": latest_data.water_level,
             "light_level": latest_data.light_level
         }
         
@@ -88,8 +87,8 @@ async def analyze_trend(
         historical_data = [
             {
                 "temperature": d.temperature,
-                "humidity": d.humidity,
                 "soil_moisture": d.soil_moisture,
+                "water_level": d.water_level,
                 "light_level": d.light_level
             }
             for d in data
@@ -113,6 +112,9 @@ async def chat_with_ai(
     db: Session = Depends(get_db)
 ):
     try:
+        from datetime import datetime, timedelta
+        from sqlalchemy import func
+        
         # Dobavi najnovije senzorske podatke
         query = db.query(SensorDataDB)
         
@@ -121,15 +123,43 @@ async def chat_with_ai(
         
         latest_data = query.order_by(SensorDataDB.timestamp.desc()).first()
         
+        # Dobavi statistiku za zadnjih 24 sata
+        time_24h_ago = datetime.utcnow() - timedelta(hours=24)
+        stats_query = db.query(
+            func.avg(SensorDataDB.temperature).label('avg_temp'),
+            func.min(SensorDataDB.temperature).label('min_temp'),
+            func.max(SensorDataDB.temperature).label('max_temp'),
+            func.avg(SensorDataDB.soil_moisture).label('avg_moisture'),
+            func.min(SensorDataDB.soil_moisture).label('min_moisture'),
+            func.max(SensorDataDB.soil_moisture).label('max_moisture'),
+            func.avg(SensorDataDB.humidity).label('avg_humidity'),
+            func.avg(SensorDataDB.light_level).label('avg_light'),
+            func.count(SensorDataDB.id).label('total_readings')
+        ).filter(SensorDataDB.timestamp >= time_24h_ago)
+        
+        if request.device_id:
+            stats_query = stats_query.filter(SensorDataDB.device_id == request.device_id)
+        
+        stats = stats_query.first()
+        
         sensor_context = ""
         if latest_data:
             sensor_context = f"""
-            Trenutni senzorski podaci:
-            - Temperatura: {latest_data.temperature}°C
-            - Vlažnost zraka: {latest_data.humidity}%
-            - Vlažnost tla: {latest_data.soil_moisture}%
-            - Razina svjetlosti: {latest_data.light_level} lux
-            """
+TRENUTNI SENZORSKI PODACI (zadnje mjerenje):
+- Temperatura: {latest_data.temperature}°C
+- Vlažnost tla: {latest_data.soil_moisture}%
+- Vlažnost zraka: {latest_data.humidity}%
+- Razina vode u spremniku: {latest_data.water_level}%
+- Razina svjetlosti: {latest_data.light_level}%
+- Vrijeme mjerenja: {latest_data.timestamp}
+
+STATISTIKA ZADNJIH 24 SATA ({stats.total_readings} mjerenja):
+- Temperatura: prosječno {stats.avg_temp:.1f}°C (min: {stats.min_temp:.1f}°C, max: {stats.max_temp:.1f}°C)
+- Vlažnost tla: prosječno {stats.avg_moisture:.1f}% (min: {stats.min_moisture}%, max: {stats.max_moisture}%)
+- Vlažnost zraka: prosječno {stats.avg_humidity:.1f}%
+- Razina svjetlosti: prosječno {stats.avg_light:.1f}%
+
+Koristi ove podatke za davanje personaliziranih preporuka korisniku."""
         
         response = ai_service.chat_with_user(request.message, sensor_context)
         

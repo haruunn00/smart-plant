@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import json
 import logging
 from app.config import settings
-from app.database import SessionLocal, SensorDataDB
+from app. database import SessionLocal, SensorDataDB
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ class MQTTService:
         except AttributeError:
             self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
+        self. client.on_message = self. on_message
         self.connected = False
         
     def on_connect(self, client, userdata, flags, rc):
@@ -28,7 +28,7 @@ class MQTTService:
             
     def on_message(self, client, userdata, msg):
         """Callback kada stigne nova poruka"""
-        try:
+        try: 
             payload = json.loads(msg.payload.decode())
             logger.info(f"Primljena poruka: {payload}")
             
@@ -44,12 +44,12 @@ class MQTTService:
         db = SessionLocal()
         try:
             sensor_data = SensorDataDB(
-                device_id=data.get("device_id"),
+                device_id=data. get("device_id"),
                 temperature=data.get("temperature"),
-                humidity=data.get("humidity"),
-                pressure=data.get("pressure"),
-                soil_moisture=data.get("soil_moisture"),
-                light_level=data.get("light_level")
+                soil_moisture=data. get("soil_moisture"),
+                water_level=data.get("water_level"),
+                light_level=data.get("light_level"),
+                humidity=data.get("humidity")               # Vlažnost zraka
             )
             db.add(sensor_data)
             db.commit()
@@ -67,7 +67,7 @@ class MQTTService:
             self.client.loop_start()
             logger.info("MQTT klijent pokrenut")
         except Exception as e:
-            logger.error(f"Greška pri pokretanju MQTT klijenta: {e}")
+            logger.error(f"Greška pri pokretanju MQTT klijenta:  {e}")
             
     def publish(self, topic: str, message: dict):
         """Objavi poruku na MQTT topic"""
@@ -76,7 +76,7 @@ class MQTTService:
             self.client.publish(topic, payload)
             logger.info(f"Poslana poruka na {topic}: {message}")
             return True
-        except Exception as e:
+        except Exception as e: 
             logger.error(f"Greška pri slanju poruke: {e}")
             return False
             

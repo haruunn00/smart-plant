@@ -1,56 +1,76 @@
 #include "mqtt.h"
 #include "config.h"
+#include "sensors.h"
 #include <ArduinoJson.h>
 
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
-// Inicijalizacija MQTT klijenta
+// ═══════════════════════════════════════════
+// Inicijalizacija MQTT
+// ═══════════════════════════════════════════
 bool initMQTT() {
     mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
     mqttClient.setCallback(mqttCallback);
     
     // Postavi pin za pumpu
     pinMode(PUMP_PIN, OUTPUT);
-    digitalWrite(PUMP_PIN, LOW);
+    digitalWrite(PUMP_PIN, HIGH);  // Relay OFF (inverted logic)
+    
+    Serial.println("✓ MQTT inicijaliziran");
+    Serial.print("  Broker: ");
+    Serial.print(MQTT_BROKER);
+    Serial.print(":");
+    Serial.println(MQTT_PORT);
     
     return true;
 }
 
-// Povezivanje na MQTT broker
+// ═══════════════════════════════════════════
+// Povezivanje na MQTT Broker
+// ═══════════════════════════════════════════
 bool connectMQTT() {
-    Serial.print("Povezivanje na MQTT broker...");
+    Serial.print("Povezivanje na MQTT broker.. .");
     
     if (mqttClient.connect(MQTT_CLIENT_ID)) {
-        Serial.println(" povezano!");
+        Serial.println(" ✓ povezano!");
         
         // Pretplati se na control topic
         mqttClient.subscribe(MQTT_TOPIC_CONTROL);
-        Serial.print("Pretplaćen na topic: ");
+        Serial.print("Pretplaćen na:  ");
         Serial.println(MQTT_TOPIC_CONTROL);
+        
+        // Blink zelena LED kao potvrda
+        blinkLED(GREEN_LED_PIN, 2, 200);
         
         return true;
     } else {
-        Serial.print(" nije uspjelo, rc=");
+        Serial.print(" ✗ greška, rc=");
         Serial.println(mqttClient.state());
+        
+        // Blink crvena LED kao greška
+        blinkLED(RED_LED_PIN, 3, 100);
+        
         return false;
     }
 }
 
-// Objavljivanje senzorskih podataka u JSON formatu
+// ═══════════════════════════════════════════
+// Objavljivanje Senzorskih Podataka
+// ═══════════════════════════════════════════
 bool publishSensorData(const SensorData& data) {
     // Kreiraj JSON dokument
     StaticJsonDocument<256> doc;
     
     doc["device_id"] = MQTT_CLIENT_ID;
     doc["temperature"] = data.temperature;
-    doc["humidity"] = data.humidity;
-    doc["pressure"] = data.pressure;
     doc["soil_moisture"] = data.soilMoisture;
-    doc["light_level"] = data.lightLevel;
+    doc["water_level"] = data.waterLevel;
+    doc["light_level"] = data. lightLevel;
+    doc["humidity"] = data.humidity;  // Simulirana vlažnost zraka
     doc["timestamp"] = data.timestamp;
     
-    // Serijaliziraj JSON
+    // Serijaliziraj u string
     char jsonBuffer[256];
     serializeJson(doc, jsonBuffer);
     
@@ -58,26 +78,28 @@ bool publishSensorData(const SensorData& data) {
     bool success = mqttClient.publish(MQTT_TOPIC_SENSOR, jsonBuffer);
     
     if (success) {
-        Serial.println("Podaci poslani na MQTT:");
+        Serial.println("📤 Podaci poslani:");
         Serial.println(jsonBuffer);
     } else {
-        Serial.println("Greška pri slanju podataka na MQTT!");
+        Serial.println("❌ Greška pri slanju podataka!");
     }
     
     return success;
 }
 
-// Callback funkcija za primanje MQTT poruka
+// ═══════════════════════════════════════════
+// MQTT Callback - Primanje Poruka
+// ═══════════════════════════════════════════
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-    Serial.print("Poruka primljena na topic: ");
+    Serial.print("📩 Poruka na topic: ");
     Serial.println(topic);
     
-    // Pretvori payload u string
+    // Konvertuj payload u string
     char message[length + 1];
     memcpy(message, payload, length);
     message[length] = '\0';
     
-    Serial.print("Poruka: ");
+    Serial.print("Sadržaj:  ");
     Serial.println(message);
     
     // Parsiraj JSON
@@ -85,19 +107,45 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     DeserializationError error = deserializeJson(doc, message);
     
     if (error) {
-        Serial.print("JSON parsing failed: ");
+        Serial.print("JSON greška: ");
         Serial.println(error.c_str());
         return;
     }
     
     // Kontrola pumpe
-    if (doc.containsKey("pump")) {
+    if (doc. containsKey("pump")) {
         bool pumpState = doc["pump"];
         controlPump(pumpState);
     }
 }
 
-// Loop funkcija za održavanje MQTT konekcije
+// ═══════════════════════════════════════════
+// Kontrola Pumpe
+// ═══════════════════════════════════════════
+void controlPump(bool state) {
+    // Proveri nivo vode pre uključivanja
+    if (state && isWaterLow()) {
+        Serial.println("❌ NIZAK NIVO VODE - Pumpa se ne može uključiti!");
+        blinkLED(RED_LED_PIN, 5, 100);
+        return;
+    }
+    
+    digitalWrite(PUMP_PIN, state ?  LOW : HIGH);  // Relay inverted logic
+    
+    Serial.print("💧 Pumpa: ");
+    Serial.println(state ? "UKLJUČENA" : "ISKLJUČENA");
+    
+    // LED indikacija
+    if (state) {
+        setGreenLED(true);
+    } else {
+        setGreenLED(false);
+    }
+}
+
+// ═══════════════════════════════════════════
+// MQTT Loop
+// ═══════════════════════════════════════════
 void mqttLoop() {
     if (!mqttClient.connected()) {
         reconnectMQTT();
@@ -105,24 +153,19 @@ void mqttLoop() {
     mqttClient.loop();
 }
 
-// Pokušaj ponovnog povezivanja na MQTT
+// ═══════════════════════════════════════════
+// Reconnect
+// ═══════════════════════════════════════════
 void reconnectMQTT() {
-    static unsigned long lastReconnectAttempt = 0;
+    static unsigned long lastAttempt = 0;
     unsigned long now = millis();
     
-    if (now - lastReconnectAttempt > MQTT_RECONNECT_INTERVAL) {
-        lastReconnectAttempt = now;
+    if (now - lastAttempt > MQTT_RECONNECT_INTERVAL) {
+        lastAttempt = now;
         
-        Serial.println("Pokušaj ponovnog povezivanja na MQTT...");
+        Serial.println("🔄 Pokušaj ponovnog povezivanja...");
         if (connectMQTT()) {
-            lastReconnectAttempt = 0;
+            lastAttempt = 0;
         }
     }
-}
-
-// Kontrola pumpe
-void controlPump(bool state) {
-    digitalWrite(PUMP_PIN, state ? HIGH : LOW);
-    Serial.print("Pumpa ");
-    Serial.println(state ? "UKLJUČENA" : "ISKLJUČENA");
 }
