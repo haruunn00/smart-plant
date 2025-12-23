@@ -141,14 +141,10 @@ Servisi će biti dostupni na:
 - 5V relej modul
 - Breadboard i žice
 
-Detaljne upute za spajanje: [docs/hardware.md](docs/hardware.md)
-
-
 
 ## 📖 API Dokumentacija
 
 API dokumentaciju potražite u:
-- [docs/api.md](docs/api.md)
 - Interaktivna dokumentacija: http://localhost:8000/docs
 
 
