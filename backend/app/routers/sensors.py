@@ -17,7 +17,7 @@ async def create_sensor_data(sensor_data: SensorDataCreate, db: Session = Depend
         return db_sensor_data
     except Exception as e: 
         db.rollback()
-        raise HTTPException(status_code=500, detail=f"Greška pri spremanju podataka: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error saving data: {str(e)}")
 
 @router.get("/", response_model=SensorDataResponse)
 async def get_sensor_data(
@@ -45,7 +45,7 @@ async def get_sensor_data(
         
         return SensorDataResponse(data=data, count=total_count)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška pri dohvaćanju podataka: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving data: {str(e)}")
 
 @router.get("/latest", response_model=SensorData)
 async def get_latest_sensor_data(
@@ -61,13 +61,13 @@ async def get_latest_sensor_data(
         latest = query.order_by(SensorDataDB.timestamp.desc()).first()
         
         if not latest:
-            raise HTTPException(status_code=404, detail="Nema dostupnih podataka")
+            raise HTTPException(status_code=404, detail="No available data")
         
         return latest
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška pri dohvaćanju podataka: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error retrieving data: {str(e)}")
 
 @router.get("/stats")
 async def get_sensor_stats(
@@ -121,4 +121,4 @@ async def get_sensor_stats(
             "period_hours": hours
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška pri izračunu statistike: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error calculating statistics: {str(e)}")

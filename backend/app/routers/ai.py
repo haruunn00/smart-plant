@@ -44,7 +44,7 @@ async def get_ai_recommendation(
         latest_data = query.order_by(SensorDataDB.timestamp.desc()).first()
         
         if not latest_data:
-            raise HTTPException(status_code=404, detail="Nema dostupnih senzorskih podataka")
+            raise HTTPException(status_code=404, detail="No available sensor data")
         
         sensor_data = {
             "temperature": latest_data.temperature,
@@ -64,7 +64,7 @@ async def get_ai_recommendation(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška pri generiranju preporuke: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error generating recommendation: {str(e)}")
 
 @router.post("/trend-analysis", response_model=TrendAnalysisResponse)
 async def analyze_trend(
@@ -82,7 +82,7 @@ async def analyze_trend(
         data = query.order_by(SensorDataDB.timestamp.asc()).all()
         
         if not data:
-            raise HTTPException(status_code=404, detail="Nema dovoljno podataka za analizu")
+            raise HTTPException(status_code=404, detail="Not enough data for analysis")
         
         historical_data = [
             {
@@ -104,7 +104,7 @@ async def analyze_trend(
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška pri analizi trenda: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error analyzing trend: {str(e)}")
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat_with_ai(
@@ -143,25 +143,25 @@ async def chat_with_ai(
         sensor_context = ""
         if latest_data:
             sensor_context = f"""
-TRENUTNI SENZORSKI PODACI (zadnje mjerenje):
-- Temperatura: {latest_data.temperature}°C
-- Vlažnost tla: {latest_data.soil_moisture}%
-- Vlažnost zraka: {latest_data.humidity}%
-- Razina vode u spremniku: {latest_data.water_level}%
-- Razina svjetlosti: {latest_data.light_level}%
-- Vrijeme mjerenja: {latest_data.timestamp}
+CURRENT SENSOR DATA (latest measurement):
+- Temperature: {latest_data.temperature}°C
+- Soil Moisture: {latest_data.soil_moisture}%
+- Air Humidity: {latest_data.humidity}%
+- Water Tank Level: {latest_data.water_level}%
+- Light Level: {latest_data.light_level}%
+- Measurement Time: {latest_data.timestamp}
 
-STATISTIKA ZADNJIH 24 SATA ({stats.total_readings} mjerenja):
-- Temperatura: prosječno {stats.avg_temp:.1f}°C (min: {stats.min_temp:.1f}°C, max: {stats.max_temp:.1f}°C)
-- Vlažnost tla: prosječno {stats.avg_moisture:.1f}% (min: {stats.min_moisture}%, max: {stats.max_moisture}%)
-- Vlažnost zraka: prosječno {stats.avg_humidity:.1f}%
-- Razina svjetlosti: prosječno {stats.avg_light:.1f}%
+STATISTICS FOR LAST 24 HOURS ({stats.total_readings} measurements):
+- Temperature: average {stats.avg_temp:.1f}°C (min: {stats.min_temp:.1f}°C, max: {stats.max_temp:.1f}°C)
+- Soil Moisture: average {stats.avg_moisture:.1f}% (min: {stats.min_moisture}%, max: {stats.max_moisture}%)
+- Air Humidity: average {stats.avg_humidity:.1f}%
+- Light Level: average {stats.avg_light:.1f}%
 
-Koristi ove podatke za davanje personaliziranih preporuka korisniku."""
+Use this data to provide personalized recommendations to the user."""
         
         response = ai_service.chat_with_user(request.message, sensor_context)
         
         return ChatResponse(response=response)
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška pri chat-u sa AI: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error in AI chat: {str(e)}")

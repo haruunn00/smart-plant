@@ -23,16 +23,16 @@ async def lifespan(app: FastAPI):
     logger.info("Inicijalizacija baze podataka...")
     init_db()
     
-    logger.info("Pokretanje MQTT servisa...")
+    logger.info("Starting MQTT service...")
     mqtt_service.connect()
     
-    logger.info("Smart Plant API uspješno pokrenut!")
+    logger.info("Smart Plant API successfully started!")
     
     yield
     
-    logger.info("Zaustavljanje Smart Plant API-ja...")
+    logger.info("Stopping Smart Plant API...")
     mqtt_service.disconnect()
-    logger.info("Smart Plant API zaustavljen.")
+    logger.info("Smart Plant API stopped.")
 
 app = FastAPI(
     title="SmartPlant API",

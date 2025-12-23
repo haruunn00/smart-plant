@@ -17,28 +17,28 @@ class AIService:
     def get_plant_recommendation(self, sensor_data: dict) -> str:
         try:
             prompt = f"""
-            Kao stručnjak za održavanje biljaka, analiziraj sljedeće podatke senzora i daj preporuku:
+            As a plant care expert, analyze the following sensor data and provide recommendations:
             
-            Temperatura: {sensor_data.get('temperature', 'N/A')}°C
-            Vlažnost tla: {sensor_data.get('soil_moisture', 'N/A')}%
-            Vlažnost zraka: {sensor_data.get('humidity', 'N/A')}%
-            Razina vode u spremniku: {sensor_data.get('water_level', 'N/A')}%
-            Razina svjetlosti: {sensor_data.get('light_level', 'N/A')}%
+            Temperature: {sensor_data.get('temperature', 'N/A')}°C
+            Soil Moisture: {sensor_data.get('soil_moisture', 'N/A')}%
+            Air Humidity: {sensor_data.get('humidity', 'N/A')}%
+            Water Tank Level: {sensor_data.get('water_level', 'N/A')}%
+            Light Level: {sensor_data.get('light_level', 'N/A')}%
             
-            Daj konkretne savjete za:
-            1. Treba li zalijevati biljku?
-            2. Je li temperatura optimalna?
-            3. Je li vlažnost zraka dobra?
-            4. Je li razina vode u spremniku dovoljna?
-            5. Je li razina svjetlosti odgovarajuća?
+            Provide specific advice for:
+            1. Should the plant be watered?
+            2. Is the temperature optimal?
+            3. Is the air humidity good?
+            4. Is the water tank level sufficient?
+            5. Is the light level appropriate?
             
-            Odgovori na hrvatskom jeziku, kratko i jasno.
+            Answer in English, briefly and clearly.
             """
             
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "Ti si stručnjak za održavanje biljaka i IoT sustave."},
+                    {"role": "system", "content": "You are an expert in plant maintenance and IoT systems."},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=400,
@@ -46,17 +46,17 @@ class AIService:
             )
             
             recommendation = response.choices[0].message.content.strip()
-            logger.info("AI preporuka uspješno generirana via GitHub Models")
+            logger.info("AI recommendation successfully generated via GitHub Models")
             return recommendation
             
         except Exception as e:
             logger.error(f"Greška pri generiranju AI preporuke: {e}")
-            return f"Greška: {str(e)[:100]}. Provjerite GITHUB_TOKEN u .env datoteci."
+            return f"Error: {str(e)[:100]}. Check GITHUB_TOKEN in .env file."
     
     def analyze_trend(self, historical_data: list) -> str:
         try:
             if not historical_data:
-                return "Nema dovoljno podataka za analizu trenda."
+                return "Not enough data for trend analysis."
   
             avg_temp = sum(d.get('temperature', 0) for d in historical_data) / len(historical_data)
             avg_moisture = sum(d.get('soil_moisture', 0) for d in historical_data) / len(historical_data)
@@ -64,21 +64,21 @@ class AIService:
             avg_light = sum(d.get('light_level', 0) for d in historical_data) / len(historical_data)
             
             prompt = f"""
-            Analiziraj trend podataka sa {len(historical_data)} mjerenja:
+            Analyze the trend from {len(historical_data)} measurements:
             
-            Prosječna temperatura: {avg_temp:.1f}°C
-            Prosječna vlažnost tla: {avg_moisture:.1f}%
-            Prosječna vlažnost zraka: {avg_humidity:.1f}%
-            Prosječna razina svjetlosti: {avg_light:.1f}%
+            Average temperature: {avg_temp:.1f}°C
+            Average soil moisture: {avg_moisture:.1f}%
+            Average air humidity: {avg_humidity:.1f}%
+            Average light level: {avg_light:.1f}%
             
-            Daj kratku analizu trenda i preporuke za poboljšanje.
-            Odgovori na hrvatskom jeziku.
+            Provide a brief trend analysis and recommendations for improvement.
+            Answer in English.
             """
             
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "Ti si data analyst specijaliziran za IoT i održavanje biljaka."},
+                    {"role": "system", "content": "You are a data analyst specialized in IoT and plant maintenance."},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=300,
@@ -86,29 +86,29 @@ class AIService:
             )
             
             analysis = response.choices[0].message.content.strip()
-            logger.info("Analiza trenda uspješno generirana via GitHub Models")
+            logger.info("Trend analysis successfully generated via GitHub Models")
             return analysis
             
         except Exception as e:
-            logger.error(f"Greška pri analizi trenda: {e}")
-            return f"Greška: {str(e)[:100]}"
+            logger.error(f"Error in trend analysis: {e}")
+            return f"Error: {str(e)[:100]}"
     
     def chat_with_user(self, user_message: str, sensor_context: str = "") -> str:
         try:
-            system_prompt = f"""Ti si AI asistent specijaliziran ISKLJUČIVO za pametno održavanje biljaka i IoT sustave za monitoring biljaka. 
+            system_prompt = f"""You are an AI assistant specialized EXCLUSIVELY in smart plant maintenance and IoT systems for plant monitoring.
 
-VAŽNO: Odgovaraj SAMO na pitanja vezana za:
-- Brigu o biljkama (zalivanje, temperatura, svjetlost, vlažnost, đubrenje)
-- Analizu senzorskih podataka
-- Problemi sa biljkama i njihovo rješavanje
-- Preporuke za optimalne uvjete rasta
-- Funkcionalnosti Smart Plant aplikacije
+IMPORTANT: Answer ONLY questions related to:
+- Plant care (watering, temperature, light, humidity, fertilization)
+- Sensor data analysis
+- Plant problems and their solutions
+- Recommendations for optimal growing conditions
+- Smart Plant application functionalities
 
-NE odgovaraj na pitanja koja nisu vezana za biljke, IoT monitoring ili ovu aplikaciju. Ako korisnik postavi pitanje izvan ovih tema, ljubazno ga usmjeri nazad na teme vezane za brigu o biljkama.
+DO NOT answer questions not related to plants, IoT monitoring, or this application. If the user asks a question outside these topics, politely redirect them back to topics related to plant care.
 
 {sensor_context}
 
-Odgovaraj na hrvatskom jeziku, budi prijateljski, koristan i temelji svoje savjete na realnim senzorskim podacima kada su dostupni."""
+Answer in English, be friendly, helpful, and base your advice on real sensor data when available."""
             
             response = self.client.chat.completions.create(
                 model=self.model,
@@ -121,16 +121,16 @@ Odgovaraj na hrvatskom jeziku, budi prijateljski, koristan i temelji svoje savje
             )
             
             chat_response = response.choices[0].message.content.strip()
-            logger.info("AI chat odgovor uspješno generiran via GitHub Models")
+            logger.info("AI chat response successfully generated via GitHub Models")
             return chat_response
             
         except Exception as e:
-            logger.error(f"Greška pri chat-u sa AI: {e}")
+            logger.error(f"Error in AI chat: {e}")
             if "401" in str(e) or "unauthorized" in str(e).lower():
-                return "GitHub token nije validan. Molimo provjerite GITHUB_TOKEN u .env datoteci."
+                return "GitHub token is not valid. Please check GITHUB_TOKEN in .env file."
             elif "rate" in str(e).lower():
-                return "Prekoračen limit zahtjeva. Molimo pričekajte nekoliko sekundi pa pokušajte ponovo."
+                return "Request limit exceeded. Please wait a few seconds and try again."
             else:
-                return f"Žao mi je, došlo je do greške: {str(e)[:100]}"
+                return f"Sorry, an error occurred: {str(e)[:100]}"
 
 ai_service = AIService()

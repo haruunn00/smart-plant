@@ -53,9 +53,9 @@ class MQTTService:
             )
             db.add(sensor_data)
             db.commit()
-            logger.info("Podaci uspješno spremljeni u bazu")
+            logger.info("Data successfully saved to database")
         except Exception as e:
-            logger.error(f"Greška pri spremanju u bazu: {e}")
+            logger.error(f"Error saving to database: {e}")
             db.rollback()
         finally:
             db.close()

@@ -26,17 +26,17 @@ async def control_pump(request: PumpControlRequest):
         success = mqtt_service.publish(settings.mqtt_topic_control, message)
         
         if success:
-            state_text = "uključena" if request.pump else "isključena"
+            state_text = "turned on" if request.pump else "turned off"
             return PumpControlResponse(
                 success=True,
-                message=f"Pumpa uspješno {state_text}",
+                message=f"Pump successfully {state_text}",
                 pump_state=request.pump
             )
         else:
-            raise HTTPException(status_code=500, detail="Greška pri slanju naredbe")
+            raise HTTPException(status_code=500, detail="Error sending command")
             
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @router.post("/auto-water")
 async def auto_water(device_id: str = "ESP32_SmartPlant"):
@@ -46,7 +46,7 @@ async def auto_water(device_id: str = "ESP32_SmartPlant"):
         
         return {
             "success": True,
-            "message": "Automatsko zalijevanje u razvoju"
+            "message": "Automatic watering in development"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Greška: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")

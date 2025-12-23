@@ -77,7 +77,7 @@ void loop() {
     mqttLoop();
 
     updatePumpLED();
-a
+    
     if (currentMillis - lastSensorRead >= SENSOR_READ_INTERVAL) {
         lastSensorRead = currentMillis;
         
