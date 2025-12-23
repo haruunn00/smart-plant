@@ -7,10 +7,9 @@ class Settings(BaseSettings):
     mqtt_port: int = 1883
     mqtt_topic_sensor: str = "smartplant/sensors"
     mqtt_topic_control: str = "smartplant/control"
-    
-    # GitHub Models API (besplatno)
+  
     github_token: str = ""
-    github_model: str = "gpt-4o-mini"  # ili gpt-4o, Llama-3.3-70B-Instruct, itd.
+    github_model: str = "gpt-4o-mini" 
     
     api_prefix: str = "/api"
     
@@ -19,6 +18,6 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
-        extra = "ignore"  # Ignoriraj nepoznate env varijable
+        extra = "ignore" 
 
 settings = Settings()

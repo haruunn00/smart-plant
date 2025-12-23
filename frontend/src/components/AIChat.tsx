@@ -73,7 +73,7 @@ export function AIChat() {
       const errorResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Žao mi je, trenutno ne mogu odgovoriti. Molimo pokušajte kasnije.',
+        content: 'I\'m sorry, but I\'m having trouble responding right now. Please try again later.',
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorResponse]);
@@ -91,7 +91,6 @@ export function AIChat() {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl p-6 shadow-lg">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-white bg-opacity-20 rounded-lg">
@@ -100,13 +99,12 @@ export function AIChat() {
           <div>
             <h1 className="text-2xl">AI Plant Assistant</h1>
             <p className="text-emerald-100 text-sm mt-1">
-              Powered by mini AI analytics engine
+              Powered by GPT4o mini model
             </p>
           </div>
         </div>
       </div>
 
-      {/* Quick Questions */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
         <p className="text-gray-600 text-sm mb-3">Quick questions:</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -122,7 +120,6 @@ export function AIChat() {
         </div>
       </div>
 
-      {/* Chat Messages */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
         <div className="h-[500px] overflow-y-auto p-6 space-y-4">
           {messages.map((message) => (
@@ -181,7 +178,6 @@ export function AIChat() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
         <div className="border-t border-gray-200 p-4">
           <div className="flex gap-2">
             <input
@@ -203,7 +199,6 @@ export function AIChat() {
         </div>
       </div>
 
-      {/* Info Card */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <p className="text-blue-800 text-sm">
           💡 <span className="">Tip:</span> The AI assistant analyzes real-time sensor data to provide personalized care recommendations for your plant.

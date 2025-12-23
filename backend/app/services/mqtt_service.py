@@ -49,7 +49,7 @@ class MQTTService:
                 soil_moisture=data. get("soil_moisture"),
                 water_level=data.get("water_level"),
                 light_level=data.get("light_level"),
-                humidity=data.get("humidity")               # Vlažnost zraka
+                humidity=data.get("humidity")             
             )
             db.add(sensor_data)
             db.commit()

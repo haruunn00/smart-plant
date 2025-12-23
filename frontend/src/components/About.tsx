@@ -3,20 +3,10 @@ import { Cpu, Wifi, Database, Globe, Droplets, Thermometer, Zap } from 'lucide-r
 export function About() {
   return (
     <div className="space-y-6">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl p-8 shadow-lg">
-        <h1 className="text-3xl mb-3">Smart Plant IoT System</h1>
-        <p className="text-emerald-100 text-lg max-w-3xl">
-          An intelligent plant care system that combines ESP32 microcontroller, sensor technology, 
-          and AI analytics to provide automated and remote plant monitoring and care.
-        </p>
-      </div>
-
-      {/* System Architecture */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-2xl text-gray-800 mb-6">System Architecture</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Hardware Layer */}
+
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-5">
             <div className="p-3 bg-blue-600 rounded-lg w-fit mb-4">
               <Cpu className="w-6 h-6 text-white" />
@@ -50,7 +40,6 @@ export function About() {
             </ul>
           </div>
 
-          {/* Backend Layer */}
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-5">
             <div className="p-3 bg-purple-600 rounded-lg w-fit mb-4">
               <Database className="w-6 h-6 text-white" />
@@ -84,7 +73,6 @@ export function About() {
             </ul>
           </div>
 
-          {/* Frontend Layer */}
           <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg p-5">
             <div className="p-3 bg-emerald-600 rounded-lg w-fit mb-4">
               <Globe className="w-6 h-6 text-white" />
@@ -120,7 +108,6 @@ export function About() {
         </div>
       </div>
 
-      {/* Key Features */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-2xl text-gray-800 mb-6">Key Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -178,7 +165,6 @@ export function About() {
         </div>
       </div>
 
-      {/* Data Flow */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-2xl text-gray-800 mb-6">Data Flow</h2>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -208,7 +194,6 @@ export function About() {
         </div>
       </div>
 
-      {/* Technical Specifications */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-2xl text-gray-800 mb-6">Technical Specifications</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -261,63 +246,12 @@ export function About() {
         </div>
       </div>
 
-      {/* Future Enhancements */}
-      <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-6">
-        <h2 className="text-2xl text-gray-800 mb-4">Future Enhancements</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-emerald-600 rounded-full mt-2" />
-            <div>
-              <p className="text-gray-800">MQTT Protocol Integration</p>
-              <p className="text-gray-600 text-sm">For more efficient IoT communication</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-emerald-600 rounded-full mt-2" />
-            <div>
-              <p className="text-gray-800">Push Notifications</p>
-              <p className="text-gray-600 text-sm">Alert users about critical conditions</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-emerald-600 rounded-full mt-2" />
-            <div>
-              <p className="text-gray-800">ML-based Watering Prediction</p>
-              <p className="text-gray-600 text-sm">Predict optimal watering schedules</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-emerald-600 rounded-full mt-2" />
-            <div>
-              <p className="text-gray-800">Cloud Deployment</p>
-              <p className="text-gray-600 text-sm">Azure/AWS hosting for global access</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-emerald-600 rounded-full mt-2" />
-            <div>
-              <p className="text-gray-800">Multiple Plant Support</p>
-              <p className="text-gray-600 text-sm">Monitor and control multiple plants</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-2 h-2 bg-emerald-600 rounded-full mt-2" />
-            <div>
-              <p className="text-gray-800">Mobile Application</p>
-              <p className="text-gray-600 text-sm">Native iOS and Android apps</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Project Info */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <h2 className="text-2xl text-gray-800 mb-4">Project Information</h2>
         <div className="space-y-2 text-gray-700">
           <p><span className="">Project Type:</span> University-Level IoT System</p>
-          <p><span className="">Complexity:</span> Advanced (Hardware + Backend + Frontend + AI)</p>
           <p><span className="">Technologies:</span> ESP32, C++, FastAPI, React, TypeScript, PostgreSQL</p>
-          <p><span className="">Year:</span> 2025</p>
         </div>
       </div>
     </div>

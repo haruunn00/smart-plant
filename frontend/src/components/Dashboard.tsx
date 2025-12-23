@@ -23,7 +23,6 @@ export function Dashboard() {
   const [isWatering, setIsWatering] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch real sensor data from backend
   const fetchSensorData = async () => {
     console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
     try {
@@ -44,7 +43,7 @@ export function Dashboard() {
         temperature: data.temperature || 0,
         humidity: data.humidity || 0,
         lightLevel: data.light_level || 0,
-        pumpActive: false, // TODO: Add pump status from API if available
+        pumpActive: false, 
         lastUpdate: new Date(data.timestamp),
       });
       setError(null);
@@ -54,10 +53,9 @@ export function Dashboard() {
     }
   };
 
-  // Fetch data on mount and every 5 seconds
   useEffect(() => {
     fetchSensorData();
-    const interval = setInterval(fetchSensorData, 5000);
+    const interval = setInterval(fetchSensorData, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -82,7 +80,6 @@ export function Dashboard() {
       const result = await response.json();
       console.log('Pump control result:', result);
       
-      // Update local state based on response
       setSensorData(prev => ({ ...prev, pumpActive: result.pump_state }));
       
     } catch (err) {
@@ -91,7 +88,6 @@ export function Dashboard() {
     } finally {
       setTimeout(() => {
         setIsWatering(false);
-        // Refresh sensor data after watering
         fetchSensorData();
       }, 5000);
     }
@@ -253,30 +249,6 @@ export function Dashboard() {
         )}
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h2 className="text-xl text-gray-800 mb-4">Live Sensor Feed</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-gray-600 text-sm">ESP32 Status</p>
-            <div className="flex items-center justify-center gap-2 mt-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-green-600">Connected</span>
-            </div>
-          </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-gray-600 text-sm">WiFi Signal</p>
-            <p className="text-gray-800 mt-2">Strong</p>
-          </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-gray-600 text-sm">Data Rate</p>
-            <p className="text-gray-800 mt-2">3s</p>
-          </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-gray-600 text-sm">Uptime</p>
-            <p className="text-gray-800 mt-2">24h 32m</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

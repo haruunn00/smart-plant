@@ -115,15 +115,13 @@ async def chat_with_ai(
         from datetime import datetime, timedelta
         from sqlalchemy import func
         
-        # Dobavi najnovije senzorske podatke
         query = db.query(SensorDataDB)
         
         if request.device_id:
             query = query.filter(SensorDataDB.device_id == request.device_id)
         
         latest_data = query.order_by(SensorDataDB.timestamp.desc()).first()
-        
-        # Dobavi statistiku za zadnjih 24 sata
+ 
         time_24h_ago = datetime.utcnow() - timedelta(hours=24)
         stats_query = db.query(
             func.avg(SensorDataDB.temperature).label('avg_temp'),

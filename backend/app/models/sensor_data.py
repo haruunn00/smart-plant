@@ -8,7 +8,7 @@ class SensorDataBase(BaseModel):
     soil_moisture: int
     water_level: int
     light_level: int
-    humidity: Optional[int] = None  # Vlažnost zraka (simulirana)
+    humidity: Optional[int] = None 
 
 class SensorDataCreate(SensorDataBase):
     pass

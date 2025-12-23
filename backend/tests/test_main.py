@@ -61,5 +61,4 @@ def test_pump_control():
     }
     
     response = client.post("/api/v1/control/pump", json=control_data)
-    # Može biti 200 (uspjeh) ili 500 (MQTT nije dostupan u testu)
     assert response.status_code in [200, 500]

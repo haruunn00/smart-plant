@@ -3,46 +3,34 @@
 
 #include <Arduino.h>
 
-// ═══════════════════════════════════════════
-// Struktura za Senzorske Podatke
-// ═══════════════════════════════════════════
 struct SensorData {
-    float temperature;      // Temperatura u °C
-    int soilMoisture;       // Vlažnost tla u %
-    int waterLevel;         // Nivo vode u %
-    int lightLevel;         // Razina svjetlosti u %
-    int humidity;           // Vlažnost zraka u % (simulirana)
+    float temperature;     
+    int soilMoisture;       
+    int waterLevel;         
+    int lightLevel;         
+    int humidity;          
     unsigned long timestamp;
 };
 
-// ═══════════════════════════════════════════
-// Funkcije za Inicijalizaciju
-// ═══════════════════════════════════════════
 bool initSensors();
 void initLEDs();
+bool initDisplay();
 
-// ═══════════════════════════════════════════
-// Funkcije za Očitavanje Senzora
-// ═══════════════════════════════════════════
 SensorData readAllSensors();
 int readSoilMoisture();
 int readWaterLevel();
 int readLightLevel();
 float readTemperature();
-int generateHumidity();    // Simulirana vlažnost zraka
+int generateHumidity();  
 
-// ═══════════════════════════════════════════
-// Pomoćne Funkcije
-// ═══════════════════════════════════════════
 bool isSoilDry();
 bool isWaterLow();
 bool isNightTime();
 
-// ═══════════════════════════════════════════
-// LED Kontrola
-// ═══════════════════════════════════════════
 void setGreenLED(bool state);
 void setRedLED(bool state);
 void blinkLED(int pin, int times, int delayMs);
+
+void updateDisplay(const SensorData& data);
 
 #endif

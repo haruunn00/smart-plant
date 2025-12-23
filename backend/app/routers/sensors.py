@@ -85,11 +85,14 @@ async def get_sensor_stats(
             func.avg(SensorDataDB.soil_moisture).label("avg_soil_moisture"),
             func.min(SensorDataDB.soil_moisture).label("min_soil_moisture"),
             func.max(SensorDataDB.soil_moisture).label("max_soil_moisture"),
-            func.avg(SensorDataDB.water_level).label("avg_water_level"),      # ✅ NOVO
-            func.min(SensorDataDB.water_level).label("min_water_level"),      # ✅ NOVO
-            func.max(SensorDataDB.water_level).label("max_water_level"),      # ✅ NOVO
-            func.avg(SensorDataDB.light_level).label("avg_light_level"),      # ✅ AŽURIRANO
-            func. count(SensorDataDB.id).label("data_points"),
+            func.avg(SensorDataDB.water_level).label("avg_water_level"),
+            func.min(SensorDataDB.water_level).label("min_water_level"),
+            func.max(SensorDataDB.water_level).label("max_water_level"),
+            func.avg(SensorDataDB.light_level).label("avg_light_level"),
+            func.avg(SensorDataDB.humidity).label("avg_humidity"),            
+            func.min(SensorDataDB.humidity).label("min_humidity"),           
+            func.max(SensorDataDB.humidity).label("max_humidity"),           
+            func.count(SensorDataDB.id).label("data_points"),
         )
         
         if device_id:
@@ -101,17 +104,20 @@ async def get_sensor_stats(
         stats = query.first()
         
         return {
-            "avg_temperature":  round(stats.avg_temperature, 2) if stats. avg_temperature else None,
+            "avg_temperature": round(stats.avg_temperature, 2) if stats.avg_temperature else None,
             "min_temperature": round(stats.min_temperature, 2) if stats.min_temperature else None,
-            "max_temperature":  round(stats.max_temperature, 2) if stats.max_temperature else None,
+            "max_temperature": round(stats.max_temperature, 2) if stats.max_temperature else None,
             "avg_soil_moisture": round(stats.avg_soil_moisture, 2) if stats.avg_soil_moisture else None,
             "min_soil_moisture": round(stats.min_soil_moisture, 2) if stats.min_soil_moisture else None,
             "max_soil_moisture": round(stats.max_soil_moisture, 2) if stats.max_soil_moisture else None,
-            "avg_water_level":  round(stats.avg_water_level, 2) if stats.avg_water_level else None,      # ✅ NOVO
-            "min_water_level":  round(stats.min_water_level, 2) if stats.min_water_level else None,      # ✅ NOVO
-            "max_water_level": round(stats.max_water_level, 2) if stats.max_water_level else None,      # ✅ NOVO
+            "avg_water_level": round(stats.avg_water_level, 2) if stats.avg_water_level else None,
+            "min_water_level": round(stats.min_water_level, 2) if stats.min_water_level else None,
+            "max_water_level": round(stats.max_water_level, 2) if stats.max_water_level else None,
             "avg_light_level": round(stats.avg_light_level, 2) if stats.avg_light_level else None,
-            "data_points": stats. data_points,
+            "avg_humidity": round(stats.avg_humidity, 2) if stats.avg_humidity else None,            
+            "min_humidity": round(stats.min_humidity, 2) if stats.min_humidity else None,           
+            "max_humidity": round(stats.max_humidity, 2) if stats.max_humidity else None,           
+            "data_points": stats.data_points,
             "period_hours": hours
         }
     except Exception as e:

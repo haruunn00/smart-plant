@@ -4,15 +4,13 @@ import { Dashboard } from './components/Dashboard';
 import { Analytics } from './components/Analytics';
 import { AIChat } from './components/AIChat';
 import { About } from './components/About';
-import { Settings } from './components/Settings';
-import { Leaf, BarChart3, MessageSquare, Info, SettingsIcon, Menu, X } from 'lucide-react';
+import { Leaf, BarChart3, MessageSquare, Info, Menu, X } from 'lucide-react';
 
 const tabs = [
   { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: Leaf },
   { id: 'analytics', path: '/analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'ai', path: '/ai', label: 'AI Assistant', icon: MessageSquare },
-  { id: 'about', path: '/about', label: 'About Project', icon: Info },
-  { id: 'settings', path: '/settings', label: 'Settings', icon: SettingsIcon },
+  { id: 'about', path: '/about', label: 'About', icon: Info },
 ];
 
 function AppContent() {
@@ -20,12 +18,10 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <header className="bg-gradient-to-r from-emerald-600 to-green-600 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between lg:justify-start">
             <div className="flex items-center gap-3">
-              {/* Logo */}
               <div className="flex-shrink-0">
                 <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="24" cy="24" r="24" fill="white" fillOpacity="0.15"/>
@@ -38,7 +34,6 @@ function AppContent() {
               <h1 className="text-white text-2xl">Smart Plant</h1>
             </div>
 
-            {/* Desktop Navigation - Centered */}
             <nav className="hidden lg:flex flex-1 justify-center">
               <div className="flex space-x-1">
                 {tabs.map((tab) => {
@@ -63,7 +58,6 @@ function AppContent() {
               </div>
             </nav>
             
-            {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 text-white hover:bg-white hover:bg-opacity-10 rounded-lg transition-colors"
@@ -74,7 +68,6 @@ function AppContent() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-gray-200 shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
@@ -102,7 +95,6 @@ function AppContent() {
         </div>
       )}
 
-      {/* Content */}
       <main className="w-full px-4 sm:px-6 lg:px-8 py-8">
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -110,15 +102,13 @@ function AppContent() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/ai" element={<AIChat />} />
           <Route path="/about" element={<About />} />
-          <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>
 
-      {/* Footer */}
       <footer className="bg-gray-50 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <p className="text-center text-gray-600 text-sm">
-            Smart Plant IoT System © 2025 | ESP32 + FastAPI + React
+            Smart Plant | © 2025 | Harun Safro. All rights reserved.
           </p>
         </div>
       </footer>

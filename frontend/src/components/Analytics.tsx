@@ -48,7 +48,6 @@ export function Analytics() {
     try {
       const hours = getHoursForRange(range);
       
-      // Fetch sensor data
       const sensorResponse = await fetch(`${import.meta.env.VITE_API_URL}/sensors?hours=${hours}&limit=100&t=${Date.now()}`, {
         headers: {
           'Cache-Control': 'no-cache',
@@ -59,7 +58,6 @@ export function Analytics() {
       }
       const sensorResult = await sensorResponse.json();
       
-      // Fetch stats
       const statsResponse = await fetch(`${import.meta.env.VITE_API_URL}/sensors/stats?hours=${hours}&t=${Date.now()}`, {
         headers: {
           'Cache-Control': 'no-cache',
@@ -70,9 +68,8 @@ export function Analytics() {
       }
       const statsResult = await statsResponse.json();
       
-      // Process sensor data for chart
       const chartData: SensorDataPoint[] = sensorResult.data
-        .reverse() // Reverse to get chronological order
+        .reverse()
         .map((item: any, index: number) => ({
           time: range === '24h' 
             ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -85,7 +82,6 @@ export function Analytics() {
       
       setData(chartData);
       
-      // Process stats
       setStats({
         avgMoisture: (statsResult.avg_soil_moisture || 0).toFixed(1),
         avgTemp: (statsResult.avg_temperature || 0).toFixed(1),

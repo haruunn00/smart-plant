@@ -4,7 +4,6 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# GitHub Models endpoint
 GITHUB_MODELS_ENDPOINT = "https://models.inference.ai.azure.com"
 
 class AIService:
