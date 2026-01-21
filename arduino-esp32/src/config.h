@@ -2,11 +2,12 @@
 #define CONFIG_H
 
 
-#define WIFI_SSID "hara"
+#define WIFI_SSID "Harun"
 #define WIFI_PASSWORD "12345678"
 
 
-#define MQTT_BROKER "192.168.0.105"
+//IP ADRESA za kucni net - 192.168.0.105
+#define MQTT_BROKER "172.20.10.2"  // IP za iphone hotspot
 #define MQTT_PORT 1883
 #define MQTT_CLIENT_ID "ESP32_SmartPlant"
 #define MQTT_TOPIC_SENSOR "smartplant/sensors"
