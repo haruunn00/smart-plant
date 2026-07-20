@@ -4,19 +4,19 @@ Kompletni IoT sistem za inteligentno praćenje i održavanje biljaka koristeći 
 
 
 
-## 📋 Opis projekta
+##  Opis projekta
 
 Smart Plant IoT System je kompletan full-stack IoT projekt koji omogućava:
-- 📊 Real-time praćenje senzora (temperatura, vlažnost zraka, vlažnost tla, svjetlost)
-- 💧 Automatsku kontrolu zalijevanja preko pumpe
-- 🤖 AI preporuke za održavanje biljaka (OpenAI GPT-4o mini)
-- 📈 Vizualizaciju podataka sa grafovima
-- 🔄 MQTT komunikaciju između ESP32 i backend servera
-- 💾 Pohranu podataka u TimescaleDB (optimizirano za time-series)
+-  Real-time praćenje senzora (temperatura, vlažnost zraka, vlažnost tla, svjetlost)
+-  Automatsku kontrolu zalijevanja preko pumpe
+-  AI preporuke za održavanje biljaka (OpenAI GPT-4o mini)
+-  Vizualizaciju podataka sa grafovima
+-  MQTT komunikaciju između ESP32 i backend servera
+-  Pohranu podataka u TimescaleDB (optimizirano za time-series)
 
 
 
-## 🏗️ Arhitektura
+##  Arhitektura
 
 ```
 ┌─────────────┐
@@ -40,7 +40,7 @@ Smart Plant IoT System je kompletan full-stack IoT projekt koji omogućava:
 
 
 
-## 🚀 Značajke
+##  Značajke
 
 ### ESP32 Firmware
 - Wi-Fi povezivanje
@@ -70,7 +70,7 @@ Smart Plant IoT System je kompletan full-stack IoT projekt koji omogućava:
 
 
 
-## 📦 Instalacija
+##  Instalacija
 
 ### Preduslovi
 - Docker & Docker Compose
@@ -130,7 +130,7 @@ Servisi će biti dostupni na:
 
 
 
-## 🔧 Hardware setup
+##  Hardware setup
 
 ### Potrebne komponente:
 - ESP32 DevKit
@@ -142,14 +142,14 @@ Servisi će biti dostupni na:
 - Breadboard i žice
 
 
-## 📖 API Dokumentacija
+##  API Dokumentacija
 
 API dokumentaciju potražite u:
 - Interaktivna dokumentacija: http://localhost:8000/docs
 
 
 
-## 📊 Korištenje
+##  Korištenje
 
 1. **Postavljanje hardwarea**: Spojite senzore i pumpu prema shemi u `docs/hardware.md`
 2. **Upload firmware**: Uploadajte kod na ESP32 pomoću PlatformIO
@@ -161,7 +161,7 @@ API dokumentaciju potražite u:
 
 
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - FastAPI 
 - TimescaleDB 
@@ -171,12 +171,12 @@ API dokumentaciju potražite u:
 
 
 
-## 📝 Licenca
+##  Licenca
 
 MIT License 
 
 
 
-## 👤 Autor
+##  Autor
 
 haruunn00 | Harun Šafro
